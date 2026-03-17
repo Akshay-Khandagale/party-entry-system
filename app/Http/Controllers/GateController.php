@@ -218,20 +218,46 @@ class GateController extends Controller
         return response()->json($gates);
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
+        $filter = $request->gate;
+        $search = $request->search;
 
-    $total = EntryLog::count();
+        $query = EntryLog::with('employee','gate');
 
-    $gate1 = EntryLog::where('gate_id',1)->count();
-    $gate2 = EntryLog::where('gate_id',2)->count();
-    $gate3 = EntryLog::where('gate_id',3)->count();
-    $gate4 = EntryLog::where('gate_id',4)->count();
+        if($filter){
+            $query->where('gate_id',$filter);
+        }
 
-    return view('dashboard',compact(
-    'total','gate1','gate2','gate3','gate4'
-    ));
+        if($search){
+            $query->whereHas('employee', function($q) use ($search){
+                $q->where('employee_id','like','%'.$search.'%');
+            });
+        }
 
+        $entries = $query->latest()->get();
+
+        $total = $entries->count();
+
+        $gate1 = EntryLog::where('gate_id',1)->count();
+        $gate2 = EntryLog::where('gate_id',2)->count();
+        $gate3 = EntryLog::where('gate_id',3)->count();
+        $gate4 = EntryLog::where('gate_id',4)->count();
+
+        return view('dashboard',compact(
+            'total','gate1','gate2','gate3','gate4','entries','filter','search'
+        ));
     }
     // new
+    public function volunteerDashboard($gate_id)
+    {
+        $entries = EntryLog::with('employee')
+                    ->where('gate_id',$gate_id)
+                    ->latest()
+                    ->get();
+
+        $total = $entries->count();
+
+        return view('volunteer_dashboard',compact('entries','total','gate_id'));
+    }
 }

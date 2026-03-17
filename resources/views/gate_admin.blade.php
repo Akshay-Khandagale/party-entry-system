@@ -17,13 +17,9 @@ padding:0;
 color:white;
 font-family:Arial, sans-serif;
 min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
 /* Background Video */
-
 #bg-video{
 position:fixed;
 right:0;
@@ -34,64 +30,27 @@ object-fit:cover;
 z-index:-1;
 }
 
-/* Main Card */
-
-.card-box{
-width:90%;
-max-width:450px;
-background:rgba(0,0,0,0.65);
-padding:30px;
+/* Main Box */
+.main-box{
+width:95%;
+margin:auto;
+margin-top:20px;
+background:rgba(0,0,0,0.7);
+padding:20px;
 border-radius:15px;
-text-align:center;
-box-shadow:0 10px 30px rgba(0,0,0,0.7);
 }
 
-/* Gate Code */
-
-.code{
-font-size:60px;
-font-weight:bold;
-letter-spacing:5px;
-margin:25px 0;
-}
-
-/* Timer */
-
-#timer{
-font-size:18px;
-}
-
-/* Tablet */
-
-@media (max-width:768px){
-
+/* Code */
 .code{
 font-size:50px;
+font-weight:bold;
+letter-spacing:5px;
+margin:20px 0;
 }
 
-}
-
-/* Mobile */
-
-@media (max-width:480px){
-
-.card-box{
-padding:20px;
-}
-
-.code{
-font-size:42px;
-letter-spacing:3px;
-}
-
-h2{
-font-size:22px;
-}
-
-button{
-font-size:18px;
-}
-
+/* Table */
+.table{
+color:white;
 }
 
 </style>
@@ -104,17 +63,58 @@ font-size:18px;
 <source src="{{ asset('video/party.mp4') }}" type="video/mp4">
 </video>
 
-<div class="card-box">
+<div class="main-box">
 
-<h2 class="mb-3">Gate {{$gate}} Admin</h2>
+<h2 class="text-center">🎉 Gate {{$gate}} Dashboard 🎉</h2>
+
+<!-- CODE GENERATOR -->
+<div class="text-center">
 
 <div id="code" class="code">-----</div>
 
-<button class="btn btn-warning w-100 mb-3" onclick="generateCode()">
+<button class="btn btn-warning mb-2" onclick="generateCode()">
 Generate Gate Code
 </button>
 
 <div id="timer"></div>
+
+</div>
+
+<hr>
+
+<!-- COUNT -->
+<h4>Total Verified : {{ $total }}</h4>
+
+<!-- TABLE -->
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Employee ID</th>
+<th>Face</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($entries as $row)
+<tr>
+<td>{{ $row->id }}</td>
+<td>{{ $row->employee->name ?? '' }}</td>
+<td>{{ $row->employee->employee_id ?? '' }}</td>
+<td><img src="/faces/{{ $row->face_image }}" width="50"></td>
+<td>{{ $row->created_at }}</td>
+</tr>
+@endforeach
+
+</tbody>
+
+</table>
+</div>
 
 </div>
 
@@ -123,19 +123,13 @@ Generate Gate Code
 function generateCode(){
 
 fetch('/generate-gate/{{$gate}}')
-
 .then(res=>res.json())
-
 .then(data=>{
-
 document.getElementById("code").innerHTML = data.code;
-
 startTimer();
-
 });
 
 }
-
 
 function startTimer(){
 
@@ -158,6 +152,11 @@ document.getElementById("code").innerHTML = "Expired";
 },1000);
 
 }
+
+// // 🔴 AUTO REFRESH TABLE
+// setInterval(function(){
+// location.reload();
+// },5000);
 
 </script>
 

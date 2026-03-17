@@ -12,4 +12,14 @@ class EntryLog extends Model
         'gate_id',
         'face_image'
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function gate()
+    {
+        return $this->belongsTo(Gate::class);
+    }
 }

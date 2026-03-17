@@ -35,3 +35,4 @@ Route::get('/generate-gate/{gate}', [GateController::class,'generateGate']);
 Route::get('/gate-codes',[GateController::class,'getGateCodes']);
 Route::get('/dashboard',[GateController::class,'dashboard']);
 // new
+Route::get('/volunteer/{gate}',[GateController::class,'volunteerDashboard']);

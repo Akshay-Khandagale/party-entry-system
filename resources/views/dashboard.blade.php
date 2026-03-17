@@ -1,138 +1,125 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Party Dashboard</title>
+<title>Admin Dashboard</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
 body{
 margin:0;
-padding:0;
 font-family:Arial;
 color:white;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-
-/* Party Gradient Background */
-
 background: radial-gradient(circle,#ff3c3c,#8B0000,#000000);
 }
-
-/* Dashboard Box */
-
 .dashboard-box{
 width:95%;
-max-width:900px;
-background:rgba(0,0,0,0.6);
-padding:40px;
-border-radius:15px;
-box-shadow:0 10px 30px rgba(0,0,0,0.7);
-}
-
-/* Gate Cards */
-
-.gate-card{
-background:rgba(255,255,255,0.1);
+margin:auto;
+margin-top:20px;
+background:rgba(0,0,0,0.7);
 padding:25px;
-border-radius:12px;
-transition:0.3s;
+border-radius:15px;
 }
-
-.gate-card:hover{
-transform:scale(1.05);
-background:rgba(255,255,255,0.2);
-}
-
-h1{
-margin-bottom:30px;
-text-shadow:0 0 15px red;
-}
-
+.table{ color:white; }
 </style>
-
 </head>
 
 <body>
 
 <div class="dashboard-box">
 
-<h1>🎉 XDBS Party Dashboard 🎉</h1>
+<h2 class="text-center mb-3">🎉 ADMIN DASHBOARD 🎉</h2>
 
-<div class="row g-4">
+<!-- FILTER + SEARCH -->
+<form method="GET" class="row g-2 mb-3">
 
-<div class="col-6 col-md-3">
-<div class="gate-card">
-<h4>Gate 1</h4>
-<a href="/gate-admin/1" class="btn btn-warning w-100 mt-2">
-Open Gate
-</a>
-</div>
-</div>
-
-<div class="col-6 col-md-3">
-<div class="gate-card">
-<h4>Gate 2</h4>
-<a href="/gate-admin/2" class="btn btn-warning w-100 mt-2">
-Open Gate
-</a>
-</div>
+<div class="col-md-4">
+<select name="gate" class="form-select">
+<option value="">All Gates</option>
+<option value="1" <?= ($filter==1)?'selected':'' ?>>Gate 1</option>
+<option value="2" <?= ($filter==2)?'selected':'' ?>>Gate 2</option>
+<option value="3" <?= ($filter==3)?'selected':'' ?>>Gate 3</option>
+<option value="4" <?= ($filter==4)?'selected':'' ?>>Gate 4</option>
+</select>
 </div>
 
-<div class="col-6 col-md-3">
-<div class="gate-card">
-<h4>Gate 3</h4>
-<a href="/gate-admin/3" class="btn btn-warning w-100 mt-2">
-Open Gate
-</a>
-</div>
+<div class="col-md-4">
+<input type="text" name="search" value="<?= $search ?>" 
+placeholder="Search Employee ID" class="form-control">
 </div>
 
-<div class="col-6 col-md-3">
-<div class="gate-card">
-<h4>Gate 4</h4>
-<a href="/gate-admin/4" class="btn btn-warning w-100 mt-2">
-Open Gate
-</a>
-</div>
+<div class="col-md-4">
+<button class="btn btn-warning w-100">Apply</button>
 </div>
 
+</form>
+
+<h5>Total Entries : <?= $total ?></h5>
+
+<!-- GRAPH -->
+<canvas id="chart" height="100"></canvas>
+
+<hr>
+
+<!-- TABLE -->
+<div class="table-responsive">
+<table class="table table-bordered table-striped mt-3">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Emp ID</th>
+<th>Gate</th>
+<th>Face</th>
+<th>Time</th>
+</tr>
+</thead>
+
+<tbody id="tableBody">
+
+@foreach($entries as $row)
+<tr>
+<td>{{ $row->id }}</td>
+<td>{{ $row->employee->name ?? '' }}</td>
+<td>{{ $row->employee->employee_id ?? '' }}</td>
+<td>Gate {{ $row->gate_id }}</td>
+<td><img src="/faces/{{ $row->face_image }}" width="50"></td>
+<td>{{ $row->created_at }}</td>
+</tr>
+@endforeach
+
+</tbody>
+
+</table>
 </div>
 
-<hr class="my-4">
-
-<h3>Total Entries : {{$total}}</h3>
-
-<div class="row mt-3">
-
-<div class="col-6 col-md-3">
-Gate 1 : {{$gate1}}
 </div>
 
-<div class="col-6 col-md-3">
-Gate 2 : {{$gate2}}
-</div>
+<!-- GRAPH SCRIPT -->
+<script>
+const ctx = document.getElementById('chart');
 
-<div class="col-6 col-md-3">
-Gate 3 : {{$gate3}}
-</div>
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: ['Gate1','Gate2','Gate3','Gate4'],
+datasets: [{
+label: 'Entries',
+data: [<?= $gate1 ?>,<?= $gate2 ?>,<?= $gate3 ?>,<?= $gate4 ?>]
+}]
+}
+});
+</script>
 
-<div class="col-6 col-md-3">
-Gate 4 : {{$gate4}}
-</div>
-
-</div>
-
-</div>
+<!-- 🔴 AUTO REFRESH -->
+<!-- <script>
+setInterval(function(){
+    location.reload();
+},5000); // refresh every 5 sec
+</script> -->
 
 </body>
-
 </html>
